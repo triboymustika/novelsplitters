@@ -8,7 +8,7 @@ export default function App() {
   const [error, setError] = useState('');
   const [copiedId, setCopiedId] = useState(null);
   
-  // Mengambil API Key dari browser pembeli/pengguna (biar nggak usah ngedit kode lagi)
+  // Mengambil API Key dari browser pembeli/pengguna
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
 
   const handleApiKeyChange = (e) => {
@@ -39,7 +39,7 @@ export default function App() {
     setParts([]);
 
     try {
-      // 1. Generate text parts using Gemini (Versi Masa Depan yang terbukti berhasil)
+      // 1. Generate text parts using Gemini 3 Flash Preview
       const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey.trim()}`;
       
       const prompt = `
@@ -57,7 +57,7 @@ export default function App() {
         3. TIKTOK (tt): WAJIB di antara 2000 hingga 3000 karakter.
         4. FORMAT (Semua Platform): Pisahkan setiap paragraf dan dialog dengan enter ganda (\n\n) agar teks berongga.
         5. HOOK & CTA: Buat Hook (awal) dan CTA (akhir) BERBEDA tiap platform. (FB: Naratif, IG: Estetik/Tanya pendapat, TT: Clickbait/Bikin penasaran).
-        6. PROMPT GAMBAR (imagePrompt): 1 gambar per part. Deskripsi visual murni BAHASA INGGRIS tentang adegan/suasana di part tersebut. WAJIB SFW (Safe for Work), tanpa teks, tanpa darah.
+        6. PROMPT GAMBAR (imagePrompt): 1 gambar per part. Deskripsi visual murni BAHASA INGGRIS tentang adegan/suasana di part tersebut. JANGAN masukkan perintah teks di sini.
       `;
 
       const textPayload = {
@@ -98,7 +98,7 @@ export default function App() {
 
       if (!textResponse.ok) {
         const errData = await textResponse.json().catch(() => ({}));
-        throw new Error(errData.error?.message || "Terjadi kesalahan pada server AI Google. Pastikan API Key valid dan coba lagi.");
+        throw new Error(errData.error?.message || "Terjadi kesalahan pada server AI Google.");
       }
       
       const textResult = await textResponse.json();
@@ -106,7 +106,6 @@ export default function App() {
       
       if (!rawJson) throw new Error("AI tidak mengembalikan teks format yang sesuai.");
       
-      // Bersihkan jika AI membalas dengan format markdown
       if (rawJson.includes("```")) {
         rawJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
       }
@@ -123,7 +122,7 @@ export default function App() {
       setParts(initializedParts);
       setIsSplitting(false);
 
-      // 2. Generate images for each part (Menggunakan Pollinations AI - Gratis & Stabil)
+      // 2. Generate images for each part (Menggunakan Gemini 3.1 Flash Image yang KEREN!)
       initializedParts.forEach((part, index) => {
         generateImageForPart(part, index);
       });
@@ -137,31 +136,58 @@ export default function App() {
 
   const generateImageForPart = async (part, index) => {
     try {
-      // Menggunakan Pollinations AI dengan seed acak agar gambar tidak nyangkut di cache
-      const seed = Math.floor(Math.random() * 100000);
-      const encodedPrompt = encodeURIComponent(`High quality digital illustration for a dramatic story. Scene: ${part.imagePrompt}. Cinematic lighting, highly detailed. Aspect ratio 9:16.`);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=576&height=1024&nologo=true&seed=${seed}`;
-
-      // Simulasi loading agar transisi visual lebih natural
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Verifikasi apakah link gambar aktif (opsional tapi bagus untuk mencegah error)
-      const testImage = new Image();
-      testImage.src = imageUrl;
+      // Kembali menggunakan server gambar dewa (Gemini Image)
+      const imageApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey.trim()}`;
       
-      testImage.onload = () => {
-        setParts(prevParts => {
-          const newParts = [...prevParts];
-          newParts[index].imageUrl = imageUrl;
+      // Menggunakan hook TikTok yang clickbait sebagai teks di dalam gambar
+      const hookTextForImage = part.tt?.hook || part.ig?.hook || `Lanjut Part ${part.partNumber}?`;
+
+      const promptGambarDewa = `
+        High quality digital illustration for a dramatic story. 
+        Scene: ${part.imagePrompt}. 
+        IMPORTANT: Include very large, bold, highly legible typography text overlaid in the center or top of the image that exactly says "PART ${part.partNumber}" and "${hookTextForImage}". Make the text look like a viral social media hook with good contrast.
+      `;
+
+      const imagePayload = {
+        contents: [{
+          role: 'user',
+          parts: [{ text: promptGambarDewa }]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE'],
+          imageConfig: { aspectRatio: "9:16" }
+        }
+      };
+
+      const response = await fetch(imageApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(imagePayload)
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error?.message || "Gagal dari server gambar.");
+      }
+
+      // Mengambil data gambar mentah (Base64)
+      const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+      const mimeType = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.mimeType || 'image/jpeg';
+
+      setParts(prevParts => {
+        const newParts = [...prevParts];
+        if (base64Data) {
+          // Jadikan format URL Base64 yang siap tampil tanpa nembak internet lagi
+          newParts[index].imageUrl = `data:${mimeType};base64,${base64Data}`;
           newParts[index].isImageLoading = false;
           newParts[index].imageError = false;
-          return newParts;
-        });
-      };
-
-      testImage.onerror = () => {
-        throw new Error("Gagal memuat gambar dari server");
-      };
+        } else {
+          newParts[index].isImageLoading = false;
+          newParts[index].imageError = true;
+        }
+        return newParts;
+      });
 
     } catch (err) {
       console.error("Image generation failed for part", part.partNumber, err);
@@ -210,23 +236,15 @@ export default function App() {
     });
   };
 
-  const handleDownloadImage = async (imageUrl, partNumber) => {
+  const handleDownloadImage = (imageUrl, partNumber) => {
     if (!imageUrl) return;
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Story_Part_${partNumber}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (e) {
-      // Fallback jika diblokir browser CORS
-      window.open(imageUrl, '_blank');
-    }
+    // Karena sekarang gambarnya base64, kita bisa download langsung tanpa fetch
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `Story_Part_${partNumber}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const PlatformColumn = ({ title, icon, data, partIndex, platformKey }) => {
@@ -269,7 +287,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-slate-200 font-sans selection:bg-cyan-500/30 pb-20">
-      {/* Navbar */}
       <nav className="bg-[#1E293B] border-b border-slate-700/50 sticky top-0 z-50 shadow-md">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -367,14 +384,12 @@ export default function App() {
             {parts.map((part, index) => (
               <div key={index} className="bg-[#1E293B] rounded-2xl p-6 shadow-2xl border border-slate-700/50 relative mt-8 sm:mt-0">
                 
-                {/* Part Header */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-6 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg border border-cyan-400/30 whitespace-nowrap z-10">
                   PART {part.partNumber}
                 </div>
 
                 <div className="mt-6 sm:mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                   
-                  {/* Column 1: Facebook */}
                   <PlatformColumn 
                     title="Facebook (100% Asli)" 
                     icon={<Facebook className="w-4 h-4 text-blue-400" />}
@@ -383,7 +398,6 @@ export default function App() {
                     platformKey="fb"
                   />
 
-                  {/* Column 2: Instagram */}
                   <PlatformColumn 
                     title="Instagram (1.5K - 2K)" 
                     icon={<Instagram className="w-4 h-4 text-pink-400" />}
@@ -392,7 +406,6 @@ export default function App() {
                     platformKey="ig"
                   />
 
-                  {/* Column 3: TikTok */}
                   <PlatformColumn 
                     title="TikTok (2K - 3K)" 
                     icon={<svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z"/></svg>}
@@ -401,7 +414,7 @@ export default function App() {
                     platformKey="tt"
                   />
 
-                  {/* Column 4: Image Generator */}
+                  {/* Column 4: Image Generator Asli Dewa */}
                   <div className="flex flex-col bg-[#162032] rounded-xl border border-slate-700/50 p-4 h-full items-center justify-between">
                     <div className="w-full flex items-center justify-center gap-2 mb-4 text-slate-300 font-medium text-sm">
                       <Sparkles className="w-4 h-4 text-yellow-400" />
@@ -412,7 +425,7 @@ export default function App() {
                       {part.isImageLoading ? (
                         <div className="flex flex-col items-center gap-3 text-slate-400 p-4 text-center">
                           <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
-                          <p className="text-sm font-medium animate-pulse">Generating...</p>
+                          <p className="text-sm font-medium animate-pulse text-cyan-400">Melukis Cover...</p>
                         </div>
                       ) : part.imageError ? (
                         <div className="flex flex-col items-center justify-center w-full h-full bg-red-900/10 p-4 text-center">
@@ -450,7 +463,7 @@ export default function App() {
                       <button
                         onClick={() => handleDownloadImage(part.imageUrl, part.partNumber)}
                         disabled={part.isImageLoading || !part.imageUrl}
-                        className="w-full py-2.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium text-white flex items-center justify-center gap-2 transition-all mt-auto text-sm"
+                        className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium text-white flex items-center justify-center gap-2 transition-all mt-auto text-sm shadow-md"
                       >
                         <Download className="w-4 h-4" />
                         Download 
