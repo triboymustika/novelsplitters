@@ -10,18 +10,11 @@ export default function App() {
   
   // Mengambil API Key dari browser pembeli/pengguna (biar nggak usah ngedit kode lagi)
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
-  const [modelName, setModelName] = useState(() => localStorage.getItem('gemini_model') || 'gemini-1.5-flash');
 
   const handleApiKeyChange = (e) => {
     const val = e.target.value;
     setApiKey(val);
     localStorage.setItem('gemini_api_key', val);
-  };
-
-  const handleModelChange = (e) => {
-    const val = e.target.value;
-    setModelName(val);
-    localStorage.setItem('gemini_model', val);
   };
 
   const handleGenerate = async () => {
@@ -46,8 +39,8 @@ export default function App() {
     setParts([]);
 
     try {
-      // 1. Generate text parts using Gemini (Versi Stabil Terbaru flash-latest)
-      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey.trim()}`;
+      // 1. Generate text parts using Gemini (Versi Masa Depan yang terbukti berhasil)
+      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey.trim()}`;
       
       const prompt = `
         Kamu adalah editor ahli untuk konten cerita Multi-Platform (Facebook, Instagram, TikTok). 
@@ -307,20 +300,6 @@ export default function App() {
                 placeholder="Paste API Key Gemini di sini (Contoh: AQ.Ab8...)"
                 className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all placeholder:text-slate-500 text-sm"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-                Pilih Versi AI (Ganti jika terjadi error "Not Found")
-              </label>
-              <select
-                value={modelName}
-                onChange={handleModelChange}
-                className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all text-sm"
-              >
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Sangat Cepat)</option>
-                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Lebih Pintar)</option>
-                <option value="gemini-1.0-pro">Gemini 1.0 Pro (Versi Lama Paling Stabil)</option>
-              </select>
             </div>
           </div>
           <a 
