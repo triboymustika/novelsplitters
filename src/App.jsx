@@ -9,7 +9,7 @@ export default function App() {
   const [copiedId, setCopiedId] = useState(null);
 
   // API Key otomatis terisi oleh sistem/lingkungan ini jika di-run di platform yang mensupportnya
-  const API_KEY = ""; 
+  const API_KEY = "AQ.Ab8RN6KcLs2XvGjY8d2NFsroMGq4IweyyYJTeY0y15pxLFf-9A"; 
 
   const handleGenerate = async () => {
     if (!chapterText.trim()) {
