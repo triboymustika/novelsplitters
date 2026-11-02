@@ -10,11 +10,18 @@ export default function App() {
   
   // Mengambil API Key dari browser pembeli/pengguna (biar nggak usah ngedit kode lagi)
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  const [modelName, setModelName] = useState(() => localStorage.getItem('gemini_model') || 'gemini-1.5-flash');
 
   const handleApiKeyChange = (e) => {
     const val = e.target.value;
     setApiKey(val);
     localStorage.setItem('gemini_api_key', val);
+  };
+
+  const handleModelChange = (e) => {
+    const val = e.target.value;
+    setModelName(val);
+    localStorage.setItem('gemini_model', val);
   };
 
   const handleGenerate = async () => {
@@ -40,7 +47,7 @@ export default function App() {
 
     try {
       // 1. Generate text parts using Gemini (Versi Stabil Terbaru flash-latest)
-      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey.trim()}`;
+      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey.trim()}`;
       
       const prompt = `
         Kamu adalah editor ahli untuk konten cerita Multi-Platform (Facebook, Instagram, TikTok). 
@@ -287,18 +294,34 @@ export default function App() {
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Input API Key Section */}
         <div className="bg-[#1E293B] rounded-2xl p-6 shadow-xl border border-slate-700/50 mb-6 max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex-1 w-full">
-            <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              API Key Gemini (Wajib diisi untuk menjalankan AI)
-            </label>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={handleApiKeyChange}
-              placeholder="Paste API Key Gemini di sini (Contoh: AQ.Ab8...)"
-              className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all placeholder:text-slate-500 text-sm"
-            />
+          <div className="flex-1 w-full space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+                API Key Gemini (Wajib diisi)
+              </label>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={handleApiKeyChange}
+                placeholder="Paste API Key Gemini di sini (Contoh: AQ.Ab8...)"
+                className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all placeholder:text-slate-500 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                Pilih Versi AI (Ganti jika terjadi error "Not Found")
+              </label>
+              <select
+                value={modelName}
+                onChange={handleModelChange}
+                className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all text-sm"
+              >
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Sangat Cepat)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Lebih Pintar)</option>
+                <option value="gemini-1.0-pro">Gemini 1.0 Pro (Versi Lama Paling Stabil)</option>
+              </select>
+            </div>
           </div>
           <a 
             href="https://aistudio.google.com/app/apikey" 
