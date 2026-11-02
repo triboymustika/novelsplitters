@@ -8,10 +8,16 @@ export default function App() {
   const [error, setError] = useState('');
   const [copiedId, setCopiedId] = useState(null);
 
-  // API Key otomatis terisi oleh sistem/lingkungan ini jika di-run di platform yang mensupportnya
+  // ⚠️ MASUKKAN API KEY GEMINI LU DI SINI (Di dalam tanda kutip)
   const API_KEY = "AQ.Ab8RN6KcLs2XvGjY8d2NFsroMGq4IweyyYJTeY0y15pxLFf-9A"; 
 
   const handleGenerate = async () => {
+    // Validasi API Key
+    if (!API_KEY || API_KEY === "MASUKKAN_API_KEY_GEMINI_DI_SINI" || API_KEY === "") {
+      setError("API Key Gemini belum dimasukkan! Silakan edit baris 12 di GitHub dan masukkan API Key lu.");
+      return;
+    }
+
     if (!chapterText.trim()) {
       setError("Silakan masukkan teks cerita terlebih dahulu.");
       return;
@@ -27,7 +33,7 @@ export default function App() {
     setParts([]);
 
     try {
-      // 1. Generate text parts using Gemini 1.5 Flash
+      // 1. Generate text parts using Gemini 1.5 Flash (Versi Stabil)
       const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
       
       const prompt = `
@@ -41,11 +47,11 @@ export default function App() {
         
         ATURAN MUTLAK & BATASAN KARAKTER:
         1. FACEBOOK (fb): HARUS 100% SAMA PERSIS dengan teks asli jika part 1, 2, 3 digabung. Dilarang memotong/meringkas 1 kata pun.
-        2. INSTAGRAM (ig): WAJIB di antara 1500 hingga 2000 karakter (setara sekitar 250-300 kata). Jika terpaksa harus diringkas karena terlalu panjang, potong bagian deskripsi narasi, JANGAN buang dialog. TIDAK BOLEH lebih dari 2000 karakter, TIDAK BOLEH kurang dari 1500 karakter.
-        3. TIKTOK (tt): WAJIB di antara 2000 hingga 3000 karakter (setara sekitar 350-450 kata). TIDAK BOLEH lebih dari 3000 karakter, TIDAK BOLEH kurang dari 2000 karakter.
-        4. FORMAT (Semua Platform): Pisahkan setiap paragraf dan dialog dengan enter ganda (\\n\\n) agar teks berongga dan tidak menumpuk.
+        2. INSTAGRAM (ig): WAJIB di antara 1500 hingga 2000 karakter. Jika terpaksa diringkas, potong bagian narasi, JANGAN buang dialog.
+        3. TIKTOK (tt): WAJIB di antara 2000 hingga 3000 karakter.
+        4. FORMAT (Semua Platform): Pisahkan setiap paragraf dan dialog dengan enter ganda (\\n\\n) agar teks berongga.
         5. HOOK & CTA: Buat Hook (awal) dan CTA (akhir) BERBEDA tiap platform. (FB: Naratif, IG: Estetik/Tanya pendapat, TT: Clickbait/Bikin penasaran).
-        6. PROMPT GAMBAR (imagePrompt): 1 gambar per part. Deskripsi visual murni BAHASA INGGRIS. WAJIB Safe for Work (SFW). JANGAN ada unsur kekerasan/darah/lebam. Gunakan metafora visual (misal: "sad girl looking at window", "broken glass on floor") jika adegan aslinya sensitif.
+        6. PROMPT GAMBAR (imagePrompt): 1 gambar per part. Deskripsi visual murni BAHASA INGGRIS tentang adegan/suasana di part tersebut. WAJIB SFW (Safe for Work), tanpa teks, tanpa darah.
       `;
 
       const textPayload = {
@@ -84,12 +90,20 @@ export default function App() {
         body: JSON.stringify(textPayload)
       });
 
-      if (!textResponse.ok) throw new Error("Gagal memecah teks cerita.");
+      if (!textResponse.ok) {
+        const errData = await textResponse.json().catch(() => ({}));
+        throw new Error(errData.error?.message || "Terjadi kesalahan pada server AI Google. Coba lagi.");
+      }
       
       const textResult = await textResponse.json();
-      const rawJson = textResult.candidates?.[0]?.content?.parts?.[0]?.text;
+      let rawJson = textResult.candidates?.[0]?.content?.parts?.[0]?.text;
       
-      if (!rawJson) throw new Error("Format respons tidak valid dari AI.");
+      if (!rawJson) throw new Error("AI tidak mengembalikan teks format yang sesuai.");
+      
+      // Bersihkan jika AI membalas dengan format markdown markdown ```json
+      if (rawJson.includes("```")) {
+        rawJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
+      }
       
       const parsedParts = JSON.parse(rawJson);
       
@@ -103,34 +117,45 @@ export default function App() {
       setParts(initializedParts);
       setIsSplitting(false);
 
-      // 2. Generate images for each part
+      // 2. Generate images for each part (Menggunakan Pollinations AI - Gratis & Stabil)
       initializedParts.forEach((part, index) => {
         generateImageForPart(part, index);
       });
 
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Terjadi kesalahan saat memproses cerita.");
+      console.error("Generate Error:", err);
+      setError(`Gagal memecah cerita: ${err.message}`);
       setIsSplitting(false);
     }
   };
 
   const generateImageForPart = async (part, index) => {
     try {
-      // Menggunakan Pollinations AI untuk generate gambar gratis dan anti-error
+      // Menggunakan Pollinations AI dengan seed acak agar gambar tidak nyangkut di cache
+      const seed = Math.floor(Math.random() * 100000);
       const encodedPrompt = encodeURIComponent(`High quality digital illustration for a dramatic story. Scene: ${part.imagePrompt}. Cinematic lighting, highly detailed. Aspect ratio 9:16.`);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=576&height=1024&nologo=true`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=576&height=1024&nologo=true&seed=${seed}`;
 
-      // Simulasi loading sebentar agar UI terlihat natural
+      // Simulasi loading agar transisi visual lebih natural
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      setParts(prevParts => {
-        const newParts = [...prevParts];
-        newParts[index].imageUrl = imageUrl;
-        newParts[index].isImageLoading = false;
-        newParts[index].imageError = false;
-        return newParts;
-      });
+      // Verifikasi apakah link gambar aktif (opsional tapi bagus untuk mencegah error)
+      const testImage = new Image();
+      testImage.src = imageUrl;
+      
+      testImage.onload = () => {
+        setParts(prevParts => {
+          const newParts = [...prevParts];
+          newParts[index].imageUrl = imageUrl;
+          newParts[index].isImageLoading = false;
+          newParts[index].imageError = false;
+          return newParts;
+        });
+      };
+
+      testImage.onerror = () => {
+        throw new Error("Gagal memuat gambar dari server");
+      };
 
     } catch (err) {
       console.error("Image generation failed for part", part.partNumber, err);
@@ -193,7 +218,7 @@ export default function App() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (e) {
-      // Fallback jika diblokir browser
+      // Fallback jika diblokir browser CORS
       window.open(imageUrl, '_blank');
     }
   };
@@ -247,7 +272,7 @@ export default function App() {
             </div>
             <h1 className="text-xl font-bold flex items-baseline gap-2">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400">Novel Splitter</span>
-              <span className="text-sm font-medium text-slate-400">by Daboy</span>
+              <span className="text-sm font-medium text-slate-400 hidden sm:inline-block">by Daboy</span>
             </h1>
           </div>
         </div>
@@ -267,19 +292,19 @@ export default function App() {
             disabled={isSplitting}
           />
           
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <p className="text-sm text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700 inline-block w-fit">
               {chapterText.length} karakter
             </p>
             <button
               onClick={handleGenerate}
               disabled={isSplitting || !chapterText.trim()}
-              className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-medium text-white shadow-lg shadow-cyan-900/20 flex items-center gap-2 transition-all transform active:scale-95"
+              className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-medium text-white shadow-lg shadow-cyan-900/20 flex items-center justify-center gap-2 transition-all transform active:scale-95"
             >
               {isSplitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Memecah ke 3 Platform...
+                  Memproses Cerita...
                 </>
               ) : (
                 <>
@@ -291,8 +316,8 @@ export default function App() {
           </div>
 
           {error && (
-            <div className="mt-4 p-4 bg-red-900/30 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-400">
-              <AlertCircle className="w-5 h-5 shrink-0" />
+            <div className="mt-4 p-4 bg-red-900/30 border border-red-500/30 rounded-xl flex items-start sm:items-center gap-3 text-red-400">
+              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 sm:mt-0" />
               <p className="text-sm">{error}</p>
             </div>
           )}
@@ -307,14 +332,14 @@ export default function App() {
             </div>
             
             {parts.map((part, index) => (
-              <div key={index} className="bg-[#1E293B] rounded-2xl p-6 shadow-2xl border border-slate-700/50 relative">
+              <div key={index} className="bg-[#1E293B] rounded-2xl p-6 shadow-2xl border border-slate-700/50 relative mt-8 sm:mt-0">
                 
                 {/* Part Header */}
-                <div className="absolute -top-4 left-6 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg border border-cyan-400/30">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-6 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg border border-cyan-400/30 whitespace-nowrap z-10">
                   PART {part.partNumber}
                 </div>
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <div className="mt-6 sm:mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                   
                   {/* Column 1: Facebook */}
                   <PlatformColumn 
@@ -359,7 +384,7 @@ export default function App() {
                       ) : part.imageError ? (
                         <div className="flex flex-col items-center justify-center w-full h-full bg-red-900/10 p-4 text-center">
                           <AlertCircle className="w-10 h-10 text-red-400 mb-2 opacity-80" />
-                          <p className="text-xs font-semibold text-red-400 mb-1">Kena Sensor AI</p>
+                          <p className="text-xs font-semibold text-red-400 mb-1">Gagal Muat Gambar</p>
                         </div>
                       ) : (
                         <img 
@@ -373,7 +398,7 @@ export default function App() {
                     {part.imageError ? (
                       <div className="w-full bg-red-950/30 border border-red-900/50 rounded-xl p-3 mt-auto">
                         <label className="block text-[10px] font-medium text-red-300 mb-1.5 uppercase tracking-wider">
-                          Edit prompt ke versi aman:
+                          Edit prompt gambar:
                         </label>
                         <textarea
                           value={part.imagePrompt}
