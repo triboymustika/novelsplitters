@@ -264,8 +264,9 @@ export default function App() {
             <div className="bg-gradient-to-tr from-cyan-500 to-blue-600 p-2 rounded-lg">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400">
-              OmniStory AI Splitter
+            <h1 className="text-xl font-bold flex items-baseline gap-2">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400">Novel Splitter</span>
+              <span className="text-sm font-medium text-slate-400">by Daboy</span>
             </h1>
           </div>
         </div>
