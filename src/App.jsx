@@ -7,14 +7,18 @@ export default function App() {
   const [parts, setParts] = useState([]);
   const [error, setError] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
 
-  // ⚠️ MASUKKAN API KEY GEMINI LU DI SINI (Di dalam tanda kutip)
-  const API_KEY = "AQ.Ab8RN6JY91pl5KgNlxBC53oiuYUE3979F_cvvLd2Nd_yLlAS6A"; 
+  const handleApiKeyChange = (e) => {
+    const val = e.target.value;
+    setApiKey(val);
+    localStorage.setItem('gemini_api_key', val);
+  };
 
   const handleGenerate = async () => {
     // Validasi API Key
-    if (!API_KEY || API_KEY === "MASUKKAN_API_KEY_GEMINI_DI_SINI" || API_KEY === "") {
-      setError("API Key Gemini belum dimasukkan! Silakan edit baris 12 di GitHub dan masukkan API Key lu.");
+    if (!apiKey || apiKey.trim() === "") {
+      setError("API Key Gemini belum dimasukkan! Silakan isi kolom API Key di atas.");
       return;
     }
 
@@ -34,7 +38,8 @@ export default function App() {
 
     try {
       // 1. Generate text parts using Gemini 1.5 Flash (Versi Stabil)
-      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+      // Tambahan .trim() untuk otomatis menghapus spasi yang gak sengaja ikut ke-copy
+      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
       
       const prompt = `
         Kamu adalah editor ahli untuk konten cerita Multi-Platform (Facebook, Instagram, TikTok). 
@@ -279,6 +284,31 @@ export default function App() {
       </nav>
 
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Input API Key Section */}
+        <div className="bg-[#1E293B] rounded-2xl p-6 shadow-xl border border-slate-700/50 mb-6 max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              API Key Gemini (Wajib diisi untuk menjalankan AI)
+            </label>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={handleApiKeyChange}
+              placeholder="Paste API Key Gemini di sini (Contoh: AIzaSy... atau AQ...)"
+              className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all placeholder:text-slate-500 text-sm"
+            />
+          </div>
+          <a 
+            href="https://aistudio.google.com/app/apikey" 
+            target="_blank" 
+            rel="noreferrer"
+            className="shrink-0 px-4 py-3 sm:mt-6 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm font-medium text-cyan-400 border border-slate-600 transition-colors flex items-center gap-2"
+          >
+            Ambil API Key Gratis
+          </a>
+        </div>
+
         {/* Input Section */}
         <div className="bg-[#1E293B] rounded-2xl p-6 shadow-xl border border-slate-700/50 mb-10 max-w-4xl mx-auto">
           <h2 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
