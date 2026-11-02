@@ -7,6 +7,8 @@ export default function App() {
   const [parts, setParts] = useState([]);
   const [error, setError] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  
+  // Mengambil API Key dari browser pembeli/pengguna (biar nggak usah ngedit kode lagi)
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
 
   const handleApiKeyChange = (e) => {
@@ -37,9 +39,8 @@ export default function App() {
     setParts([]);
 
     try {
-      // 1. Generate text parts using Gemini 1.5 Flash (Versi Stabil)
-      // Tambahan .trim() untuk otomatis menghapus spasi yang gak sengaja ikut ke-copy
-      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
+      // 1. Generate text parts using Gemini (Versi Stabil Terbaru flash-latest)
+      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey.trim()}`;
       
       const prompt = `
         Kamu adalah editor ahli untuk konten cerita Multi-Platform (Facebook, Instagram, TikTok). 
@@ -54,7 +55,7 @@ export default function App() {
         1. FACEBOOK (fb): HARUS 100% SAMA PERSIS dengan teks asli jika part 1, 2, 3 digabung. Dilarang memotong/meringkas 1 kata pun.
         2. INSTAGRAM (ig): WAJIB di antara 1500 hingga 2000 karakter. Jika terpaksa diringkas, potong bagian narasi, JANGAN buang dialog.
         3. TIKTOK (tt): WAJIB di antara 2000 hingga 3000 karakter.
-        4. FORMAT (Semua Platform): Pisahkan setiap paragraf dan dialog dengan enter ganda (\\n\\n) agar teks berongga.
+        4. FORMAT (Semua Platform): Pisahkan setiap paragraf dan dialog dengan enter ganda (\n\n) agar teks berongga.
         5. HOOK & CTA: Buat Hook (awal) dan CTA (akhir) BERBEDA tiap platform. (FB: Naratif, IG: Estetik/Tanya pendapat, TT: Clickbait/Bikin penasaran).
         6. PROMPT GAMBAR (imagePrompt): 1 gambar per part. Deskripsi visual murni BAHASA INGGRIS tentang adegan/suasana di part tersebut. WAJIB SFW (Safe for Work), tanpa teks, tanpa darah.
       `;
@@ -97,7 +98,7 @@ export default function App() {
 
       if (!textResponse.ok) {
         const errData = await textResponse.json().catch(() => ({}));
-        throw new Error(errData.error?.message || "Terjadi kesalahan pada server AI Google. Coba lagi.");
+        throw new Error(errData.error?.message || "Terjadi kesalahan pada server AI Google. Pastikan API Key valid dan coba lagi.");
       }
       
       const textResult = await textResponse.json();
@@ -105,7 +106,7 @@ export default function App() {
       
       if (!rawJson) throw new Error("AI tidak mengembalikan teks format yang sesuai.");
       
-      // Bersihkan jika AI membalas dengan format markdown markdown ```json
+      // Bersihkan jika AI membalas dengan format markdown
       if (rawJson.includes("```")) {
         rawJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
       }
@@ -295,7 +296,7 @@ export default function App() {
               type="password"
               value={apiKey}
               onChange={handleApiKeyChange}
-              placeholder="Paste API Key Gemini di sini (Contoh: AIzaSy... atau AQ...)"
+              placeholder="Paste API Key Gemini di sini (Contoh: AQ.Ab8...)"
               className="w-full bg-[#0F172A] border border-slate-600 rounded-xl p-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all placeholder:text-slate-500 text-sm"
             />
           </div>
