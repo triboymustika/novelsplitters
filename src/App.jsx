@@ -9,7 +9,7 @@ export default function App() {
   const [copiedId, setCopiedId] = useState(null);
 
   // ⚠️ MASUKKAN API KEY GEMINI LU DI SINI (Di dalam tanda kutip)
-  const API_KEY = "AQ.Ab8RN6KcLs2XvGjY8d2NFsroMGq4IweyyYJTeY0y15pxLFf-9A"; 
+  const API_KEY = "AQ.Ab8RN6JY91pl5KgNlxBC53oiuYUE3979F_cvvLd2Nd_yLlAS6A"; 
 
   const handleGenerate = async () => {
     // Validasi API Key
