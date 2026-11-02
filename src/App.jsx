@@ -27,8 +27,8 @@ export default function App() {
     setParts([]);
 
     try {
-      // 1. Generate text parts using Gemini 3 Flash Preview with Structured JSON Output
-      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
+      // 1. Generate text parts using Gemini 1.5 Flash
+      const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
       
       const prompt = `
         Kamu adalah editor ahli untuk konten cerita Multi-Platform (Facebook, Instagram, TikTok). 
@@ -117,46 +117,18 @@ export default function App() {
 
   const generateImageForPart = async (part, index) => {
     try {
-      const imageApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${API_KEY}`;
-      
-      // Menggunakan Hook TikTok untuk teks di gambar karena biasanya paling menarik
-      const imagePrompt = `
-        High quality digital illustration for a dramatic story. 
-        Scene: ${part.imagePrompt}. 
-        IMPORTANT: Include very large, bold, highly legible typography text overlaid in the center or top of the image that exactly says "PART ${part.partNumber}" and "${part.tt.hook}". Make the text look like a viral social media hook with good contrast.
-      `;
+      // Menggunakan Pollinations AI untuk generate gambar gratis dan anti-error
+      const encodedPrompt = encodeURIComponent(`High quality digital illustration for a dramatic story. Scene: ${part.imagePrompt}. Cinematic lighting, highly detailed. Aspect ratio 9:16.`);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=576&height=1024&nologo=true`;
 
-      const imagePayload = {
-        contents: [{
-          role: 'user',
-          parts: [{ text: imagePrompt }]
-        }],
-        generationConfig: {
-          responseModalities: ['IMAGE'],
-          imageConfig: { aspectRatio: "9:16" }
-        }
-      };
-
-      const response = await fetch(imageApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(imagePayload)
-      });
-
-      const result = await response.json();
-      const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-      const mimeType = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.mimeType || 'image/jpeg';
+      // Simulasi loading sebentar agar UI terlihat natural
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       setParts(prevParts => {
         const newParts = [...prevParts];
-        if (base64Data) {
-          newParts[index].imageUrl = `data:${mimeType};base64,${base64Data}`;
-          newParts[index].isImageLoading = false;
-          newParts[index].imageError = false;
-        } else {
-          newParts[index].isImageLoading = false;
-          newParts[index].imageError = true;
-        }
+        newParts[index].imageUrl = imageUrl;
+        newParts[index].isImageLoading = false;
+        newParts[index].imageError = false;
         return newParts;
       });
 
@@ -207,14 +179,23 @@ export default function App() {
     });
   };
 
-  const handleDownloadImage = (imageUrl, partNumber) => {
+  const handleDownloadImage = async (imageUrl, partNumber) => {
     if (!imageUrl) return;
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `Story_Part_${partNumber}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Story_Part_${partNumber}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      // Fallback jika diblokir browser
+      window.open(imageUrl, '_blank');
+    }
   };
 
   const PlatformColumn = ({ title, icon, data, partIndex, platformKey }) => {
