@@ -20,9 +20,7 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
 
-    <!-- ========================================== -->
-    <!-- HALAMAN LOGIN (GEMBOK APLIKASI)            -->
-    <!-- ========================================== -->
+    <!-- HALAMAN LOGIN -->
     <div id="loginScreen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
             <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -38,24 +36,18 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MAIN APP (Disembunyikan sebelum login)     -->
-    <!-- ========================================== -->
+    <!-- MAIN APP -->
     <div id="mainApp" class="hidden flex-col min-h-screen">
-        <!-- Navbar -->
         <nav class="bg-white shadow-sm px-6 py-4 sticky top-0 z-20">
             <div class="max-w-[1400px] mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    <h1 class="text-xl font-bold text-gray-800">
-                        Novel Splitter <span class="text-indigo-600">Pro</span>
-                    </h1>
+                    <h1 class="text-xl font-bold text-gray-800">Novel Splitter <span class="text-indigo-600">Pro</span></h1>
                 </div>
                 <div class="text-sm font-medium bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">AI Edition</div>
             </div>
         </nav>
 
-        <!-- API Key Input -->
         <div class="max-w-[1400px] mx-auto mt-6 px-4 md:px-6 lg:px-8 w-full">
             <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                 <div class="text-sm text-yellow-800 flex items-center gap-2">
@@ -66,16 +58,12 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <main class="flex-grow p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto w-full flex flex-col gap-8">
             <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <!-- Left: Text Input -->
                 <div class="xl:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-200 p-5 flex flex-col h-full">
                     <label for="novelInput" class="block text-sm font-bold text-gray-800 mb-2">📄 Naskah Novel Utuh (1 Bab)</label>
                     <textarea id="novelInput" class="w-full flex-grow min-h-[250px] rounded-xl border-gray-300 border p-4 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y bg-gray-50" placeholder="Tempelkan satu bab novel utuh di sini..."></textarea>
                 </div>
-
-                <!-- Right: Character Reference -->
                 <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
                     <div class="mb-4">
                         <h2 class="text-sm font-bold text-gray-800">📸 Referensi Wajah Karakter (Opsional)</h2>
@@ -105,7 +93,6 @@
                 </div>
             </section>
 
-            <!-- Generate Button -->
             <div class="flex justify-center">
                 <button id="generateBtn" onclick="handleGenerate()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 text-lg w-full md:w-auto">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
@@ -113,7 +100,6 @@
                 </button>
             </div>
 
-            <!-- Results Section -->
             <section id="resultsSection" class="hidden flex-col gap-6 mt-4">
                 <div class="flex flex-col sm:flex-row justify-between items-center bg-indigo-50 border border-indigo-200 p-4 rounded-2xl w-full gap-4 shadow-sm">
                     <div class="flex items-center gap-4 w-full">
@@ -147,10 +133,7 @@
     </div>
 
     <script>
-        // ==========================================
-        // SISTEM LOGIN (Ganti Password Di Sini)
-        // ==========================================
-        const MASTER_PASSWORD = "UDA2026"; // <-- GANTI PASSWORD DI SINI SEBELUM JUALAN
+        const MASTER_PASSWORD = "UDA2026"; 
         
         function checkPassword() {
             const input = document.getElementById('passwordInput').value;
@@ -165,40 +148,37 @@
             }
         }
 
-        // ==========================================
-        // KODE LOGIC UTAMA APP
-        // ==========================================
         let globalFbSplits = {}, globalIgSplits = {}, globalTtSplits = {};
         let globalImagePrompts = {}, globalImageTexts = {};
         const charRefsData = [null, null, null, null]; 
 
+        // KUNCI UTAMA: MEMATIKAN SENSOR API KE TINGKAT TERENDAH
+        const relaxedSafety = [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+        ];
+
         function getApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key) {
-                alert("PENTING: Harap masukkan Gemini API Key Anda di bagian atas halaman terlebih dahulu!");
-                return null;
-            }
+            if (!key) { alert("PENTING: Harap masukkan Gemini API Key Anda!"); return null; }
             return key;
         }
 
-        function showLoading(msg) {
-            document.getElementById('loadingOverlay').classList.remove('hidden');
-            document.getElementById('loadingStatus').innerText = msg;
-        }
+        function showLoading(msg) { document.getElementById('loadingOverlay').classList.remove('hidden'); document.getElementById('loadingStatus').innerText = msg; }
         function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
         function updateLoadingMsg(msg) { document.getElementById('loadingStatus').innerText = msg; }
         
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
+            const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg;
             toast.classList.remove('translate-y-24', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
         }
 
         async function copyText(elementId) {
             const text = document.getElementById(elementId).value || document.getElementById(elementId).innerText;
-            try { await navigator.clipboard.writeText(text); showToast("Teks berhasil disalin!"); } 
-            catch (err) { alert("Gagal menyalin teks."); }
+            try { await navigator.clipboard.writeText(text); showToast("Teks berhasil disalin!"); } catch (err) { alert("Gagal menyalin teks."); }
         }
 
         function handleImageUpload(event, index) {
@@ -261,15 +241,13 @@
             return { part1: parts[0], part2: parts[1], part3: parts[2] };
         }
 
-        // ==========================================
-        // UPDATE: SYSTEM PROMPT AI YANG LEBIH AMAN
-        // ==========================================
         async function getLLMData(novelText, API_KEY) {
+            // Prompt dikembalikan ke versi fiksi yang lebih bebas seperti awal
             const systemPrompt = `Anda adalah Ahli Copywriter Profesional spesialis novel sosmed. TUGAS: BUAT HOOK DAN CTA UNTUK 3 BAGIAN CERITA, serta PROMPT GAMBAR.
 1. FACEBOOK: Gaya curhat emosional.
 2. INSTAGRAM: Gaya misterius bikin kepo.
 3. TIKTOK: Gaya ngegas ala FYP.
-4. imagePrompts: PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons. PENTING: PROMPT GAMBAR HARUS 100% AMAN (SAFE FOR WORK). JANGAN masukkan unsur darah, kekerasan, senjata, atau hantu/monster yang mengerikan. Gunakan pendekatan 'Psychological Suspense' (siluet, bayangan gelap, ekspresi wajah tegang, atau suasana ruangan yang sepi dan misterius) agar lolos AI safety filter.
+4. imagePrompts: Buat deskripsi adegan visual (Bahasa Inggris) dengan standar: "PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons, NO anime". WAJIB SEBUT NAMA KARAKTER secara spesifik di prompt.
 5. imageText: Teks poster super dramatis. WAJIB DIAWALI TULISAN "PART 1" (atau 2/3).`;
             
             const schema = {
@@ -287,7 +265,8 @@
             const payload = {
                 contents: [{ parts: [{ text: `Konteks:\n\n${novelText.substring(0, 15000)}` }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+                generationConfig: { responseMimeType: "application/json", responseSchema: schema },
+                safetySettings: relaxedSafety // MENERAPKAN SENSOR LONGGAR
             };
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
             const result = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -362,7 +341,11 @@
             });
             if (hasRefs) parts.unshift({ text: charContext });
 
-            const payload = { contents: [{ parts: parts }], generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "9:16" } } };
+            const payload = { 
+                contents: [{ parts: parts }], 
+                generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "9:16" } },
+                safetySettings: relaxedSafety // MENERAPKAN SENSOR LONGGAR UNTUK GAMBAR
+            };
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${API_KEY}`;
             
             try {
@@ -375,20 +358,21 @@
             } catch (err) { return { error: true, part: partNumber, text: overlayText }; }
         }
 
-        // ==========================================
-        // UPDATE: SYSTEM PROMPT UNTUK REGENERATE GAMBAR
-        // ==========================================
         async function regenerateSingleImage(partNumber) {
             const API_KEY = getApiKey(); if (!API_KEY) return;
             const input = document.getElementById('novelInput').value.trim(); if (!input) return;
             showLoading(`Meracik ulang visual Part ${partNumber}...`);
             try {
                 const promptStr = `Konteks Cerita:\n${input.substring(0, 5000)}\n\nBuatkan 1 adegan visual baru (imagePrompt) dan 1 teks poster clickbait baru (imageText) SESUAI CERITA DI ATAS untuk Part ${partNumber}. 
-imagePrompt: PHOTOREALISTIC CINEMATIC movie scene. HARUS AMAN DARI FILTER KEKERASAN/HOROR. Jangan ada darah atau sosok mengerikan. Fokus pada siluet, bayangan, atau wajah tegang karakter.
+imagePrompt: PHOTOREALISTIC CINEMATIC movie scene.
 imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
                 
                 const schema = { type: "OBJECT", properties: { imagePrompt: { type: "STRING" }, imageText: { type: "STRING" } }, required: ["imagePrompt", "imageText"] };
-                const payload = { contents: [{ parts: [{ text: promptStr }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
+                const payload = { 
+                    contents: [{ parts: [{ text: promptStr }] }], 
+                    generationConfig: { responseMimeType: "application/json", responseSchema: schema },
+                    safetySettings: relaxedSafety // MENERAPKAN SENSOR LONGGAR
+                };
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
                 
                 const res = await fetchWithRetry(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
@@ -417,25 +401,21 @@ imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
                     <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
                         <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700"><h2 class="font-black text-xl tracking-wide">BAGIAN (PART) ${i}</h2></div>
                         <div class="grid grid-cols-1 lg:grid-cols-4 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
-                            <!-- FB -->
                             <div class="p-5 flex flex-col h-full bg-blue-50/20">
                                 <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-blue-800 text-sm">FB (Utuh)</h3><span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold" id="fb-char-${i}">0c</span></div>
                                 <textarea id="fb-text-${i}" class="w-full h-80 p-3 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 flex-grow mb-4 resize-none bg-white text-gray-700"></textarea>
                                 <button onclick="copyText('fb-text-${i}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3 rounded-xl transition">Copy FB Part ${i}</button>
                             </div>
-                            <!-- IG -->
                             <div class="p-5 flex flex-col h-full bg-pink-50/20">
                                 <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-pink-700 text-sm">IG (Sama)</h3><span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-bold" id="ig-char-${i}">0c</span></div>
                                 <textarea id="ig-text-${i}" class="w-full h-80 p-3 border border-pink-200 rounded-xl text-sm focus:ring-2 focus:ring-pink-500 flex-grow mb-4 resize-none bg-white text-gray-700"></textarea>
                                 <button onclick="copyText('ig-text-${i}')" class="w-full bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold py-3 rounded-xl transition">Copy IG Part ${i}</button>
                             </div>
-                            <!-- TT -->
                             <div class="p-5 flex flex-col h-full bg-gray-50/50">
                                 <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-gray-900 text-sm">TikTok (Sama)</h3><span class="text-[10px] bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full font-bold" id="tt-char-${i}">0c</span></div>
                                 <textarea id="tt-text-${i}" class="w-full h-80 p-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-gray-500 flex-grow mb-4 resize-none bg-white text-gray-700"></textarea>
                                 <button onclick="copyText('tt-text-${i}')" class="w-full bg-black hover:bg-gray-900 text-white text-sm font-bold py-3 rounded-xl transition">Copy TikTok Part ${i}</button>
                             </div>
-                            <!-- IMG -->
                             <div class="p-5 flex flex-col h-full bg-emerald-50/30">
                                 <h3 class="font-bold text-emerald-800 text-sm mb-3">Visual Poster</h3>
                                 <div id="img-container-${i}" class="relative w-full aspect-[9/16] bg-gray-200 rounded-2xl border-2 border-emerald-100 mb-4 overflow-hidden flex flex-col items-center justify-center">
