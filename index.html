@@ -20,7 +20,6 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
 
-    <!-- HALAMAN LOGIN -->
     <div id="loginScreen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
             <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -28,15 +27,12 @@
             </div>
             <h2 class="text-2xl font-black text-gray-800 mb-2">Akses Eksklusif</h2>
             <p class="text-sm text-gray-500 mb-6">Masukkan PIN/Password yang Anda dapatkan saat pembelian untuk menggunakan Novel Splitter Pro.</p>
-            
             <input type="password" id="passwordInput" placeholder="Masukkan PIN di sini..." class="w-full text-center text-lg p-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-0 mb-4 transition-colors" onkeypress="if(event.key === 'Enter') checkPassword()">
             <p id="loginError" class="text-red-500 text-sm font-bold mb-4 hidden">❌ PIN Salah! Silakan coba lagi.</p>
-            
             <button onclick="checkPassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg hover:shadow-xl active:scale-95">BUKA APLIKASI</button>
         </div>
     </div>
 
-    <!-- MAIN APP -->
     <div id="mainApp" class="hidden flex-col min-h-screen">
         <nav class="bg-white shadow-sm px-6 py-4 sticky top-0 z-20">
             <div class="max-w-[1400px] mx-auto flex items-center justify-between">
@@ -240,14 +236,11 @@
             return { part1: parts[0], part2: parts[1], part3: parts[2] };
         }
 
-        // =========================================================================
-        // REVISI SUPER KETAT: MEMAKSA AI MENGGUNAKAN KOSA KATA 100% AMAN (ANTI-BLOKIR)
-        // =========================================================================
         async function getLLMData(novelText, API_KEY) {
             const systemPrompt = `Anda adalah Ahli Copywriter Profesional spesialis novel sosmed. TUGAS: BUAT HOOK, CTA, DAN PROMPT GAMBAR.
 1. FACEBOOK, IG, TIKTOK: Bebas berekspresi (boleh dramatis/emosional/konflik).
-2. imagePrompts: ATURAN WAJIB ANTI-BLOKIR: JANGAN SEKALI-KALI memasukkan kata-kata sensitif (seperti: violence, sad, crying, angry, fighting, blood, abuse, eviction). Cukup deskripsikan adegan yang NETRAL, ELEGAN, ATAU MISTERIUS SAJA (contoh: "A woman standing in a vintage living room", "A luxurious baby shoe in a velvet box").
-3. imageText: Teks clickbait. ATURAN WAJIB ANTI-BLOKIR: HARAM MENGGUNAKAN KATA KASAR/NEGATIF (seperti: mati, diusir, yatim, kejam, gila, bunuh, berdarah). Ganti dengan Diksi Aman nan Misterius (contoh: "RAHASIA KELUARGA", "KEPUTUSAN BESAR", "TAKDIR YANG BERUBAH"). WAJIB DIAWALI TULISAN "PART 1" (atau 2/3).`;
+2. imagePrompts: Buat deskripsi adegan visual (Bahasa Inggris) dengan standar: "PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons, NO anime". WAJIB SEBUT NAMA KARAKTER secara spesifik di prompt.
+3. imageText: Teks poster super dramatis. WAJIB DIAWALI TULISAN "PART 1" (atau 2/3).`;
             
             const schema = {
                 type: "OBJECT", properties: {
@@ -303,7 +296,7 @@
                     const safeText = globalImageTexts[`part${partNum}`] || `PART ${partNum}`;
                     generateSafeImage(safePrompt, safeText, partNum, API_KEY)
                         .then(res => renderSingleImage(res, partNum))
-                        .catch(err => renderSingleImage({ error: true, part: partNum, text: safeText }, partNum));
+                        .catch(err => renderSingleImage({ error: true, part: partNum, text: safeText, detail: err.message }, partNum));
                 });
                 hideLoading();
                 document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
@@ -324,9 +317,11 @@
             } catch (e) { hideLoading(); alert("Gagal regenerate: " + e.message); }
         }
 
+        // =========================================================================
+        // PERUBAHAN: MENCABUT PARAMETER YANG BISA DITOLAK SERVER + MENANGKAP ERROR ASLI
+        // =========================================================================
         async function generateSafeImage(scenePrompt, overlayText, partNumber, API_KEY) {
-            // Memastikan instruksi keamanan menempel langsung saat gambar di-generate
-            let promptStr = `CRITICAL: PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons, NO anime. SAFE FOR WORK ONLY, NO VIOLENCE, NO NEGATIVE EMOTIONS. SCENE: ${scenePrompt}. The words "${overlayText}" are written boldly in the image with cinematic poster typography.`;
+            let promptStr = `PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons, NO anime. SCENE: ${scenePrompt}. The words "${overlayText}" are written boldly in the image with cinematic poster typography.`;
             let parts = [{ text: promptStr }];
             let charContext = "Character References:\n";
             let hasRefs = false;
@@ -341,35 +336,42 @@
             });
             if (hasRefs) parts.unshift({ text: charContext });
 
+            // MENCABUT safetySettings dari payload khusus gambar agar tidak ditendang server
             const payload = { 
                 contents: [{ parts: parts }], 
-                generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "9:16" } },
-                safetySettings: relaxedSafety
+                generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "9:16" } }
             };
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${API_KEY}`;
             
             try {
                 const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const result = await response.json();
-                if (result.promptFeedback?.blockReason) throw new Error("Safety block");
+                
+                // MENANGKAP PESAN ERROR DARI SERVER (Misal: 404 Model Not Found / 400 Bad Request)
+                if (result.error) {
+                    throw new Error(result.error.message || "API Error Code: " + result.error.code);
+                }
+                
+                if (result.promptFeedback?.blockReason) throw new Error("Safety block: " + result.promptFeedback.blockReason);
+                
                 const imgData = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-                if (!imgData) throw new Error("No image returned.");
+                if (!imgData) throw new Error("API tidak merespon dengan data gambar.");
+                
                 return { url: `data:${imgData.inlineData.mimeType};base64,${imgData.inlineData.data}`, part: partNumber, text: overlayText };
-            } catch (err) { return { error: true, part: partNumber, text: overlayText }; }
+            } catch (err) { 
+                // Mengirim error detail ke layar UI
+                return { error: true, part: partNumber, text: overlayText, detail: err.message }; 
+            }
         }
 
-        // =========================================================================
-        // REGENERATE IMAGE: ATURAN ANTI BLOKIR (SAMA SEPERTI DI ATAS)
-        // =========================================================================
         async function regenerateSingleImage(partNumber) {
             const API_KEY = getApiKey(); if (!API_KEY) return;
             const input = document.getElementById('novelInput').value.trim(); if (!input) return;
             showLoading(`Meracik ulang visual Part ${partNumber}...`);
             try {
-                const promptStr = `Konteks Cerita:\n${input.substring(0, 5000)}\n\nBuatkan 1 adegan visual baru (imagePrompt) dan 1 teks poster clickbait baru (imageText) untuk Part ${partNumber}.
-ATURAN ANTI-BLOKIR: 
-1. imagePrompt: PHOTOREALISTIC CINEMATIC. 100% AMAN. JANGAN ada adegan menangis, marah, atau kekerasan. Deskripsikan orang yang sedang santai/netral atau sorot benda estetik saja.
-2. imageText: Teks clickbait. DILARANG KERAS MENGGUNAKAN KATA SENSITIF (mati, usir, kejam, yatim). Ganti dengan kata elegan dan misterius (contoh: "RAHASIA", "KEPUTUSAN", "TAKDIR"). WAJIB diawali "PART ${partNumber}: ".`;
+                const promptStr = `Konteks Cerita:\n${input.substring(0, 5000)}\n\nBuatkan 1 adegan visual baru (imagePrompt) dan 1 teks poster clickbait baru (imageText) SESUAI CERITA DI ATAS untuk Part ${partNumber}.
+imagePrompt: PHOTOREALISTIC CINEMATIC movie scene.
+imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
                 
                 const schema = { type: "OBJECT", properties: { imagePrompt: { type: "STRING" }, imageText: { type: "STRING" } }, required: ["imagePrompt", "imageText"] };
                 const payload = { 
@@ -424,7 +426,7 @@ ATURAN ANTI-BLOKIR:
                                 <h3 class="font-bold text-emerald-800 text-sm mb-3">Visual Poster</h3>
                                 <div id="img-container-${i}" class="relative w-full aspect-[9/16] bg-gray-200 rounded-2xl border-2 border-emerald-100 mb-4 overflow-hidden flex flex-col items-center justify-center">
                                     <div class="loader-sm" id="img-loader-${i}"></div>
-                                    <span id="img-status-${i}" class="text-xs text-gray-500 mt-3 font-medium">Melukis visual...</span>
+                                    <span id="img-status-${i}" class="text-xs text-gray-500 mt-3 font-medium text-center px-4">Melukis visual...</span>
                                     <img id="img-preview-${i}" class="w-full h-full object-cover hidden transition-opacity">
                                 </div>
                                 <div class="flex flex-col gap-2 mt-auto">
@@ -450,7 +452,8 @@ ATURAN ANTI-BLOKIR:
             document.getElementById(`img-loader-${partNumber}`).classList.add('hidden');
             const status = document.getElementById(`img-status-${partNumber}`), preview = document.getElementById(`img-preview-${partNumber}`), btn = document.getElementById(`img-download-${partNumber}`);
             if (imgObj.error) {
-                status.innerHTML = `<span class="text-red-500 font-bold">Gagal/AI Filter</span><br><br><span class="text-xs text-gray-500">Kata Pemicu:<br>"${imgObj.text}"</span>`;
+                // UI ERROR DIPERBARUI: Sekarang menampilkan pesan asli dari Google API
+                status.innerHTML = `<span class="text-red-600 font-bold text-[11px] leading-tight break-words">Error Google API:<br>${imgObj.detail}</span>`;
                 status.classList.remove('hidden');
             } else {
                 status.classList.add('hidden');
