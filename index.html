@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novel Splitter Pro - Hybrid AI Edition</title>
+    <title>Novel Splitter Pro - Auto Poster Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -40,7 +40,7 @@
                     <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                     <h1 class="text-xl font-bold text-gray-800">Novel Splitter <span class="text-indigo-600">Pro</span></h1>
                 </div>
-                <div class="text-sm font-medium bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">Hybrid Free Tier</div>
+                <div class="text-sm font-medium bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">Auto Canvas Stamping</div>
             </div>
         </nav>
 
@@ -48,7 +48,7 @@
             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                 <div class="text-sm text-blue-800 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <strong>🔑 API Key Gemini (Untuk Teks):</strong> Gunakan API Key gratisan Anda. Gambar 100% diproses gratis oleh server pihak ketiga.
+                    <strong>🔑 API Key Gemini (Untuk Teks):</strong> Gunakan API Key gratisan. Visual diproses HD otomatis.
                 </div>
                 <input type="password" id="apiKeyInput" placeholder="Paste API Key di sini (AIzaSy...)" class="w-full md:w-96 p-2.5 border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-white">
             </div>
@@ -225,11 +225,12 @@
                 }
             }
 
+            // Prompt sudah tidak perlu menyuruh AI menulis teks di dalam gambar
             const systemPrompt = `Anda adalah Ahli Copywriter Spesialis Novel Sosmed.
 1. FB, IG, TIKTOK: Buat hook/CTA dramatis.
-2. imagePrompts (BAHASA INGGRIS): Deskripsi adegan visual sinematik. STANDAR: "Photorealistic cinematic movie scene". DILARANG KERAS MENGGUNAKAN KATA KASAR/SADIS (seperti: blood, kill, abuse) agar lolos filter global.
+2. imagePrompts (BAHASA INGGRIS): Deskripsi murni latar adegan visual sinematik. STANDAR: "Photorealistic cinematic movie scene". JANGAN MENYURUH AI MENULIS TEKS APAPUN DI DALAM GAMBAR INI.
 ${hasChars ? charContext : ''}
-3. imageText: Teks clickbait singkat. WAJIB DIAWALI "PART 1: " (atau 2/3).`;
+3. imageText: Teks clickbait singkat (Maksimal 7-10 kata agar muat di poster). WAJIB DIAWALI "PART 1: " (atau 2/3).`;
             
             const schema = {
                 type: "OBJECT", properties: {
@@ -277,11 +278,9 @@ ${hasChars ? charContext : ''}
                 document.getElementById('resultsSection').classList.remove('hidden');
                 document.getElementById('resultsSection').classList.add('flex');
                 
-                // MENGAMBIL GAMBAR DARI SERVER POLLINATIONS (GRATIS & TANPA API KEY)
                 for (let i = 1; i <= 3; i++) {
                     const safePrompt = globalImagePrompts[`part${i}`] || "Cinematic dramatic scene";
                     const safeText = globalImageTexts[`part${i}`] || `PART ${i}`;
-                    
                     fetchFreeImage(safePrompt, safeText, i);
                 }
                 
@@ -291,49 +290,110 @@ ${hasChars ? charContext : ''}
         }
 
         async function handleRegenerateHooks() {
-            handleGenerate(); // Mengulang dari awal
+            handleGenerate();
         }
 
         // =====================================================================
-        // JALUR TIKUS BARU: GENERATE GAMBAR GRATIS PAKAI POLLINATIONS.AI
+        // FUNGSI CANVAS STAMPING: CETAK TEKS DI ATAS GAMBAR SECARA SEMPURNA
         // =====================================================================
+        
+        // Helper untuk memotong teks otomatis (word wrap) di Canvas
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            for(let n = 0; n < words.length; n++) {
+              let testLine = line + words[n] + ' ';
+              let metrics = context.measureText(testLine);
+              let testWidth = metrics.width;
+              if (testWidth > maxWidth && n > 0) {
+                context.fillText(line, x, y);
+                line = words[n] + ' ';
+                y += lineHeight;
+              } else {
+                line = testLine;
+              }
+            }
+            context.fillText(line, x, y);
+        }
+
         async function fetchFreeImage(scenePrompt, overlayText, partNumber) {
             document.getElementById(`img-loader-${partNumber}`).classList.remove('hidden');
-            document.getElementById(`img-status-${partNumber}`).innerText = "Melukis visual (Gratis)...";
+            document.getElementById(`img-status-${partNumber}`).innerText = "Melukis visual HD & Menyetempel Teks...";
             document.getElementById(`img-status-${partNumber}`).classList.remove('hidden');
             document.getElementById(`img-preview-${partNumber}`).classList.add('hidden');
             
-            // Menggabungkan adegan dan teks poster
-            const finalPrompt = `${scenePrompt}. The words "${overlayText}" are written boldly in the center of the image with cinematic poster typography.`;
-            
-            // Encode teks ke format URL
-            const encodedPrompt = encodeURIComponent(finalPrompt);
-            const randomSeed = Math.floor(Math.random() * 1000000); // Biar hasilnya selalu baru
-            
-            // Format 9:16 (Vertikal Sosmed)
-            const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=720&height=1280&nologo=true&seed=${randomSeed}`;
+            // Menggunakan engine 'flux' untuk gambar ultra-realistis
+            const encodedPrompt = encodeURIComponent(scenePrompt + ", masterpiece, high quality, highly detailed, 8k resolution, cinematic lighting, photorealistic");
+            const randomSeed = Math.floor(Math.random() * 1000000); 
+            // URL Pollinations
+            const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=720&height=1280&nologo=true&seed=${randomSeed}&model=flux`;
             
             try {
-                // Mengambil gambar sebagai file digital (Blob)
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("Gagal terhubung ke server gambar gratis.");
-                
-                const blob = await response.blob();
-                const objectUrl = URL.createObjectURL(blob);
-                
-                // Render ke layar
-                document.getElementById(`img-loader-${partNumber}`).classList.add('hidden');
-                document.getElementById(`img-status-${partNumber}`).classList.add('hidden');
-                
-                const preview = document.getElementById(`img-preview-${partNumber}`);
-                preview.src = objectUrl; 
-                preview.classList.remove('hidden');
-                
-                const btn = document.getElementById(`img-download-${partNumber}`);
-                btn.href = objectUrl; 
-                btn.download = `Poster_Novel_Part_${partNumber}.png`; 
-                btn.classList.remove('hidden'); 
-                btn.classList.add('block');
+                // Memuat gambar ke dalam memori
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // Izin keamanan untuk Canvas
+                img.src = url;
+
+                img.onload = () => {
+                    // Membuat elemen Canvas di balik layar
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 720;
+                    canvas.height = 1280;
+                    const ctx = canvas.getContext('2d');
+
+                    // 1. Gambar latar visual HD-nya
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // 2. Bikin gradasi hitam di bagian bawah supaya teksnya kontras terbaca
+                    const gradient = ctx.createLinearGradient(0, canvas.height * 0.5, 0, canvas.height);
+                    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, canvas.height * 0.5, canvas.width, canvas.height * 0.5);
+
+                    // 3. Persiapan Nulis Teks
+                    ctx.textAlign = "center";
+                    
+                    // Memisah tulisan "PART 1:" dengan isi judulnya
+                    let parts = overlayText.split(":");
+                    let partText = parts[0] ? parts[0].trim() + ":" : "";
+                    let titleText = parts[1] ? parts[1].trim() : overlayText;
+                    if(!parts[1]) { partText = ""; titleText = overlayText; } // Jaga-jaga kalau format teks beda
+
+                    // Render teks "PART X:"
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 45px Arial, sans-serif";
+                    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillText(partText, canvas.width / 2, canvas.height - 240);
+
+                    // Render teks Judul Clickbait (Warna Emas & Word Wrap)
+                    ctx.fillStyle = "#FFD700"; // Emas
+                    ctx.font = "900 60px Arial, sans-serif";
+                    // Pakai wrapText supaya teks kepanjangan otomatis turun ke baris baru
+                    wrapText(ctx, titleText.toUpperCase(), canvas.width / 2, canvas.height - 160, 660, 70);
+
+                    // 4. Ubah Canvas jadi gambar file PNG yang siap di-download
+                    const finalDataUrl = canvas.toDataURL("image/png");
+
+                    // Tampilkan ke layar
+                    document.getElementById(`img-loader-${partNumber}`).classList.add('hidden');
+                    document.getElementById(`img-status-${partNumber}`).classList.add('hidden');
+                    
+                    const preview = document.getElementById(`img-preview-${partNumber}`);
+                    preview.src = finalDataUrl; 
+                    preview.classList.remove('hidden');
+                    
+                    const btn = document.getElementById(`img-download-${partNumber}`);
+                    btn.href = finalDataUrl; 
+                    btn.download = `Poster_Novel_Part_${partNumber}.png`; 
+                    btn.classList.remove('hidden'); 
+                    btn.classList.add('block');
+                };
+
+                img.onerror = () => { throw new Error("Gagal memuat gambar dari server."); };
 
             } catch (err) {
                 document.getElementById(`img-loader-${partNumber}`).classList.add('hidden');
@@ -349,14 +409,13 @@ ${hasChars ? charContext : ''}
             document.getElementById(`img-preview-${partNumber}`).classList.add('hidden');
             document.getElementById(`img-download-${partNumber}`).classList.add('hidden');
             document.getElementById(`img-loader-${partNumber}`).classList.remove('hidden');
-            document.getElementById(`img-status-${partNumber}`).innerText = "Membuat ide baru...";
+            document.getElementById(`img-status-${partNumber}`).innerText = "Mencari ide visual baru...";
             document.getElementById(`img-status-${partNumber}`).classList.remove('hidden');
 
             try {
-                // 1. Minta Gemini bikinin prompt teks baru
                 const promptStr = `Konteks Cerita:\n${input.substring(0, 5000)}\n\nBuatkan 1 adegan visual baru (imagePrompt) dan 1 teks poster clickbait baru (imageText) SESUAI CERITA DI ATAS untuk Part ${partNumber}.
-imagePrompt: PHOTOREALISTIC CINEMATIC movie scene. (Bahasa Inggris).
-imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
+imagePrompt: PHOTOREALISTIC CINEMATIC movie scene. (Bahasa Inggris). JANGAN MINTA AI NULIS TEKS.
+imageText: Teks clickbait. (Maksimal 7-10 kata). WAJIB diawali "PART ${partNumber}: ".`;
                 
                 const schema = { type: "OBJECT", properties: { imagePrompt: { type: "STRING" }, imageText: { type: "STRING" } }, required: ["imagePrompt", "imageText"] };
                 const payload = { 
@@ -371,7 +430,6 @@ imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
                 const newPrompt = data.imagePrompt || "Cinematic dramatic scene";
                 const newText = data.imageText || `PART ${partNumber}`;
                 
-                // 2. Suruh Pollinations lukis gambarnya secara gratis
                 fetchFreeImage(newPrompt, newText, partNumber);
                 
             } catch (e) { 
@@ -403,9 +461,9 @@ imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
                                 <button onclick="copyText('tt-text-${i}')" class="w-full bg-black hover:bg-gray-900 text-white text-sm font-bold py-3 rounded-xl transition">Copy TikTok Part ${i}</button>
                             </div>
                             
-                            <!-- KOLOM GAMBAR KEMBALI MUNCUL -->
+                            <!-- KOLOM GAMBAR DENGAN CANVAS STAMPING -->
                             <div class="p-5 flex flex-col h-full bg-emerald-50/30">
-                                <h3 class="font-bold text-emerald-800 text-sm mb-3">Visual Poster (Gratis)</h3>
+                                <h3 class="font-bold text-emerald-800 text-sm mb-3">Visual Poster (HD Flux)</h3>
                                 <div id="img-container-${i}" class="relative w-full aspect-[9/16] bg-gray-200 rounded-2xl border-2 border-emerald-100 mb-4 overflow-hidden flex flex-col items-center justify-center">
                                     <div class="loader-sm" id="img-loader-${i}"></div>
                                     <span id="img-status-${i}" class="text-xs text-gray-500 mt-3 font-medium text-center px-4">Melukis visual...</span>
