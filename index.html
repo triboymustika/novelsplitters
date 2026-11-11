@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novel Splitter Generator - Pro Access</title>
+    <title>Novel Splitter Pro - Copywriting & Prompt Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,12 +14,12 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         #loadingOverlay { backdrop-filter: blur(4px); }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        .loader-sm { border: 3px solid #f3f3f3; border-top: 3px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
 
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
             <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -33,6 +33,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP -->
     <div id="mainApp" class="hidden flex-col min-h-screen">
         <nav class="bg-white shadow-sm px-6 py-4 sticky top-0 z-20">
             <div class="max-w-[1400px] mx-auto flex items-center justify-between">
@@ -40,17 +41,17 @@
                     <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                     <h1 class="text-xl font-bold text-gray-800">Novel Splitter <span class="text-indigo-600">Pro</span></h1>
                 </div>
-                <div class="text-sm font-medium bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">AI Edition</div>
+                <div class="text-sm font-medium bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Prompt Engine (Free Tier)</div>
             </div>
         </nav>
 
         <div class="max-w-[1400px] mx-auto mt-6 px-4 md:px-6 lg:px-8 w-full">
-            <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-                <div class="text-sm text-yellow-800 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    <strong>🔑 Gemini API Key:</strong> Masukkan kunci API Anda untuk mengaktifkan AI.
+            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                <div class="text-sm text-blue-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <strong>🔑 API Key Gemini (Teks Gratis):</strong> Gunakan kunci API standar Anda. Bebas kuota gambar.
                 </div>
-                <input type="password" id="apiKeyInput" placeholder="Paste API Key di sini (AIzaSy...)" class="w-full md:w-96 p-2.5 border border-yellow-300 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500 bg-white">
+                <input type="password" id="apiKeyInput" placeholder="Paste API Key di sini (AIzaSy...)" class="w-full md:w-96 p-2.5 border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-white">
             </div>
         </div>
 
@@ -58,409 +59,4 @@
             <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div class="xl:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-200 p-5 flex flex-col h-full">
                     <label for="novelInput" class="block text-sm font-bold text-gray-800 mb-2">📄 Naskah Novel Utuh (1 Bab)</label>
-                    <textarea id="novelInput" class="w-full flex-grow min-h-[250px] rounded-xl border-gray-300 border p-4 text-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y bg-gray-50" placeholder="Tempelkan satu bab novel utuh di sini..."></textarea>
-                </div>
-                <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-                    <div class="mb-4">
-                        <h2 class="text-sm font-bold text-gray-800">📸 Referensi Wajah Karakter (Opsional)</h2>
-                        <p class="text-xs text-gray-500">Unggah foto agar AI menghasilkan gambar tokoh yang konsisten.</p>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <script>
-                            for(let i=0; i<4; i++) {
-                                document.write(`
-                                    <div class="bg-gray-50 border border-gray-200 p-3 rounded-xl flex flex-col gap-2">
-                                        <label class="block text-[11px] font-bold text-gray-500 uppercase text-center">Tokoh ${i+1}</label>
-                                        <div class="aspect-square bg-white rounded-lg relative overflow-hidden flex items-center justify-center border-2 border-dashed border-gray-300 hover:border-indigo-500 cursor-pointer transition-colors group" onclick="document.getElementById('charFile-${i}').click()">
-                                            <img id="charImgPreview-${i}" class="hidden w-full h-full object-cover">
-                                            <div id="charImgPlaceholder-${i}" class="text-xs text-gray-400 text-center p-2 group-hover:text-indigo-500">
-                                                <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                                Upload
-                                            </div>
-                                            <input type="file" id="charFile-${i}" class="hidden" accept="image/*" onchange="handleImageUpload(event, ${i})">
-                                        </div>
-                                        <input type="text" id="charName-${i}" placeholder="Nama (Misal: Raju)" class="w-full text-xs p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
-                                        <input type="text" id="charRole-${i}" placeholder="Panggilan" class="w-full text-xs p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
-                                    </div>
-                                `);
-                            }
-                        </script>
-                    </div>
-                </div>
-            </section>
-
-            <div class="flex justify-center">
-                <button id="generateBtn" onclick="handleGenerate()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 text-lg w-full md:w-auto">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    PROSES NASKAH & GAMBAR
-                </button>
-            </div>
-
-            <section id="resultsSection" class="hidden flex-col gap-6 mt-4">
-                <div class="flex flex-col sm:flex-row justify-between items-center bg-indigo-50 border border-indigo-200 p-4 rounded-2xl w-full gap-4 shadow-sm">
-                    <div class="flex items-center gap-4 w-full">
-                        <div class="bg-indigo-100 p-3 rounded-xl text-indigo-600 hidden sm:block">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-indigo-900 mb-0.5">Kurang Puas dengan Clickbait & CTA?</h3>
-                            <p class="text-xs text-indigo-700">Generate ulang kalimat pembuka & penutup yang beda per platform tanpa merusak atau mengubah teks naskah murni Anda.</p>
-                        </div>
-                    </div>
-                    <button onclick="handleRegenerateHooks()" class="w-full sm:w-auto bg-white border-2 border-indigo-600 hover:bg-indigo-50 text-indigo-700 font-bold py-2.5 px-6 rounded-xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 text-sm whitespace-nowrap">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        GENERATE ULANG HOOK
-                    </button>
-                </div>
-                <div id="partsContainer" class="flex flex-col gap-8"></div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Overlays -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/80 z-50 flex flex-col items-center justify-center hidden">
-        <div class="loader mb-5"></div>
-        <h2 class="text-2xl font-black text-gray-800 mb-2 drop-shadow-sm">Memproses AI...</h2>
-        <p id="loadingStatus" class="text-gray-600 font-medium text-center px-4 max-w-md bg-white p-3 rounded-lg shadow-sm border border-gray-100">Sedang memotong naskah...</p>
-    </div>
-    <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-24 opacity-0 z-[60] flex items-center gap-3 font-medium">
-        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span id="toastMsg">Teks disalin!</span>
-    </div>
-
-    <script>
-        const MASTER_PASSWORD = "UDA2026"; 
-        
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const errorMsg = document.getElementById('loginError');
-            if (input === MASTER_PASSWORD) {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('mainApp').classList.add('flex');
-                errorMsg.classList.add('hidden');
-            } else {
-                errorMsg.classList.remove('hidden');
-            }
-        }
-
-        let globalFbSplits = {}, globalIgSplits = {}, globalTtSplits = {};
-        let globalImagePrompts = {}, globalImageTexts = {};
-        const charRefsData = [null, null, null, null]; 
-
-        const relaxedSafety = [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-        ];
-
-        function getApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key) { alert("PENTING: Harap masukkan Gemini API Key Anda!"); return null; }
-            return key;
-        }
-
-        function showLoading(msg) { document.getElementById('loadingOverlay').classList.remove('hidden'); document.getElementById('loadingStatus').innerText = msg; }
-        function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
-        function updateLoadingMsg(msg) { document.getElementById('loadingStatus').innerText = msg; }
-        
-        function showToast(msg) {
-            const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg;
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
-        }
-
-        async function copyText(elementId) {
-            const text = document.getElementById(elementId).value || document.getElementById(elementId).innerText;
-            try { await navigator.clipboard.writeText(text); showToast("Teks berhasil disalin!"); } catch (err) { alert("Gagal menyalin teks."); }
-        }
-
-        function handleImageUpload(event, index) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    charRefsData[index] = { base64: e.target.result.split(',')[1], mimeType: file.type };
-                    document.getElementById(`charImgPreview-${index}`).src = e.target.result;
-                    document.getElementById(`charImgPreview-${index}`).classList.remove('hidden');
-                    document.getElementById(`charImgPlaceholder-${index}`).classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        const delay = ms => new Promise(res => setTimeout(res, ms));
-        async function fetchWithRetry(url, options, maxRetries = 3) {
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-                    return await response.json();
-                } catch (error) {
-                    if (attempt === maxRetries - 1) throw error;
-                    await delay(1000 * Math.pow(2, attempt)); 
-                }
-            }
-        }
-
-        function formatSpacing(text) {
-            if (!text) return "";
-            if (!text.includes('\n\n') && text.length > 200) {
-                let lines = text.split('\n').map(l => l.trim()).filter(l => l);
-                if (lines.length > 1) return lines.join('\n\n');
-                let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-                let formatted = "";
-                for (let i = 0; i < sentences.length; i++) {
-                    formatted += sentences[i].trim() + " ";
-                    if ((i + 1) % 2 === 0) formatted += "\n\n";
-                }
-                return formatted.trim();
-            }
-            return text;
-        }
-
-        function splitTextEqually(text) {
-            let paragraphs = text.split(/\n+/).filter(p => p.trim() !== '');
-            if (paragraphs.length < 3) {
-                const third = Math.floor(text.length / 3);
-                return { part1: text.substring(0, third).trim(), part2: text.substring(third, third * 2).trim(), part3: text.substring(third * 2).trim() };
-            }
-            let targetChars = paragraphs.join('').length / 3;
-            let parts = ["", "", ""], currentPart = 0, currentCharCount = 0;
-            for (let i = 0; i < paragraphs.length; i++) {
-                if (currentCharCount >= targetChars && currentPart < 2) { currentPart++; currentCharCount = 0; }
-                parts[currentPart] += (parts[currentPart] ? '\n\n' : '') + paragraphs[i];
-                currentCharCount += paragraphs[i].length;
-            }
-            return { part1: parts[0], part2: parts[1], part3: parts[2] };
-        }
-
-        async function getLLMData(novelText, API_KEY) {
-            const systemPrompt = `Anda adalah Ahli Copywriter Profesional spesialis novel sosmed. TUGAS: BUAT HOOK, CTA, DAN PROMPT GAMBAR.
-1. FACEBOOK, IG, TIKTOK: Bebas berekspresi (boleh dramatis/emosional/konflik).
-2. imagePrompts: Buat deskripsi adegan visual (Bahasa Inggris) dengan standar: "PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons, NO anime". WAJIB SEBUT NAMA KARAKTER secara spesifik di prompt.
-3. imageText: Teks poster super dramatis. WAJIB DIAWALI TULISAN "PART 1" (atau 2/3).`;
-            
-            const schema = {
-                type: "OBJECT", properties: {
-                    fbHooks: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    igHooks: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    ttHooks: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    fbCtas: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    igCtas: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    ttCtas: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    imagePrompts: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } },
-                    imageText: { type: "OBJECT", properties: { part1: {type: "STRING"}, part2: {type: "STRING"}, part3: {type: "STRING"} } }
-                }, required: ["imagePrompts", "imageText"]
-            };
-            const payload = {
-                contents: [{ parts: [{ text: `Konteks:\n\n${novelText.substring(0, 15000)}` }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: { responseMimeType: "application/json", responseSchema: schema },
-                safetySettings: relaxedSafety
-            };
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
-            const result = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            try { return JSON.parse(result.candidates[0].content.parts[0].text); } catch (e) { return {}; }
-        }
-
-        async function handleGenerate() {
-            const API_KEY = getApiKey(); if (!API_KEY) return;
-            const input = document.getElementById('novelInput').value.trim();
-            if (!input) return alert("Naskah kosong!");
-            showLoading("Memproses dengan AI Gemini...");
-            try {
-                const baseSplits = splitTextEqually(input);
-                globalFbSplits = { ...baseSplits }; globalIgSplits = { ...baseSplits }; globalTtSplits = { ...baseSplits };
-                
-                updateLoadingMsg("Menganalisis cerita dan menyusun Hook/Visual...");
-                const llmData = await getLLMData(input, API_KEY);
-                
-                globalImagePrompts = llmData?.imagePrompts || {};
-                globalImageTexts = llmData?.imageText || llmData?.imageTexts || {};
-
-                const fbData = { part1: `${llmData.fbHooks?.part1||''}\n\n${globalFbSplits.part1}\n\n${llmData.fbCtas?.part1||''}`, part2: `${llmData.fbHooks?.part2||''}\n\n${globalFbSplits.part2}\n\n${llmData.fbCtas?.part2||''}`, part3: `${llmData.fbHooks?.part3||''}\n\n${globalFbSplits.part3}\n\n${llmData.fbCtas?.part3||''}` };
-                const igData = { part1: `${llmData.igHooks?.part1||''}\n\n${formatSpacing(globalIgSplits.part1)}\n\n${llmData.igCtas?.part1||''}`, part2: `${llmData.igHooks?.part2||''}\n\n${formatSpacing(globalIgSplits.part2)}\n\n${llmData.igCtas?.part2||''}`, part3: `${llmData.igHooks?.part3||''}\n\n${formatSpacing(globalIgSplits.part3)}\n\n${llmData.igCtas?.part3||''}` };
-                const ttData = { part1: `${llmData.ttHooks?.part1||''}\n\n${formatSpacing(globalTtSplits.part1)}\n\n${llmData.ttCtas?.part1||''}`, part2: `${llmData.ttHooks?.part2||''}\n\n${formatSpacing(globalTtSplits.part2)}\n\n${llmData.ttCtas?.part2||''}`, part3: `${llmData.ttHooks?.part3||''}\n\n${formatSpacing(globalTtSplits.part3)}\n\n${llmData.ttCtas?.part3||''}` };
-
-                generateUIStructure();
-                populateTextData(fbData, igData, ttData);
-
-                document.getElementById('resultsSection').classList.remove('hidden');
-                document.getElementById('resultsSection').classList.add('flex');
-                
-                updateLoadingMsg("Mencetak 3 Visual AI dengan Referensi...");
-                [1, 2, 3].forEach(partNum => {
-                    const safePrompt = globalImagePrompts[`part${partNum}`] || "Cinematic dramatic scene";
-                    const safeText = globalImageTexts[`part${partNum}`] || `PART ${partNum}`;
-                    generateSafeImage(safePrompt, safeText, partNum, API_KEY)
-                        .then(res => renderSingleImage(res, partNum))
-                        .catch(err => renderSingleImage({ error: true, part: partNum, text: safeText, detail: err.message }, partNum));
-                });
-                hideLoading();
-                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-            } catch (error) { hideLoading(); alert("Error: " + error.message); }
-        }
-
-        async function handleRegenerateHooks() {
-            const API_KEY = getApiKey(); if (!API_KEY) return;
-            const input = document.getElementById('novelInput').value.trim(); if (!input) return;
-            showLoading("Meracik ulang Hook dan CTA baru...");
-            try {
-                const llmData = await getLLMData(input, API_KEY);
-                const fbData = { part1: `${llmData.fbHooks?.part1||''}\n\n${globalFbSplits.part1}\n\n${llmData.fbCtas?.part1||''}`, part2: `${llmData.fbHooks?.part2||''}\n\n${globalFbSplits.part2}\n\n${llmData.fbCtas?.part2||''}`, part3: `${llmData.fbHooks?.part3||''}\n\n${globalFbSplits.part3}\n\n${llmData.fbCtas?.part3||''}` };
-                const igData = { part1: `${llmData.igHooks?.part1||''}\n\n${formatSpacing(globalIgSplits.part1)}\n\n${llmData.igCtas?.part1||''}`, part2: `${llmData.igHooks?.part2||''}\n\n${formatSpacing(globalIgSplits.part2)}\n\n${llmData.igCtas?.part2||''}`, part3: `${llmData.igHooks?.part3||''}\n\n${formatSpacing(globalIgSplits.part3)}\n\n${llmData.igCtas?.part3||''}` };
-                const ttData = { part1: `${llmData.ttHooks?.part1||''}\n\n${formatSpacing(globalTtSplits.part1)}\n\n${llmData.ttCtas?.part1||''}`, part2: `${llmData.ttHooks?.part2||''}\n\n${formatSpacing(globalTtSplits.part2)}\n\n${llmData.ttCtas?.part2||''}`, part3: `${llmData.ttHooks?.part3||''}\n\n${formatSpacing(globalTtSplits.part3)}\n\n${llmData.ttCtas?.part3||''}` };
-                populateTextData(fbData, igData, ttData);
-                hideLoading(); showToast("Hook dan CTA berhasil diperbarui!");
-            } catch (e) { hideLoading(); alert("Gagal regenerate: " + e.message); }
-        }
-
-        // =========================================================================
-        // PERUBAHAN: MENCABUT PARAMETER YANG BISA DITOLAK SERVER + MENANGKAP ERROR ASLI
-        // =========================================================================
-        async function generateSafeImage(scenePrompt, overlayText, partNumber, API_KEY) {
-            let promptStr = `PHOTOREALISTIC CINEMATIC movie scene. ABSOLUTELY NO cartoons, NO anime. SCENE: ${scenePrompt}. The words "${overlayText}" are written boldly in the image with cinematic poster typography.`;
-            let parts = [{ text: promptStr }];
-            let charContext = "Character References:\n";
-            let hasRefs = false;
-
-            charRefsData.forEach((char, idx) => {
-                const name = document.getElementById(`charName-${idx}`).value.trim();
-                if (char && name) {
-                    hasRefs = true;
-                    charContext += `- Name: ${name} (Role: ${document.getElementById(`charRole-${idx}`).value.trim()})\n`;
-                    parts.push({ inlineData: { data: char.base64, mimeType: char.mimeType } });
-                }
-            });
-            if (hasRefs) parts.unshift({ text: charContext });
-
-            // MENCABUT safetySettings dari payload khusus gambar agar tidak ditendang server
-            const payload = { 
-                contents: [{ parts: parts }], 
-                generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "9:16" } }
-            };
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${API_KEY}`;
-            
-            try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const result = await response.json();
-                
-                // MENANGKAP PESAN ERROR DARI SERVER (Misal: 404 Model Not Found / 400 Bad Request)
-                if (result.error) {
-                    throw new Error(result.error.message || "API Error Code: " + result.error.code);
-                }
-                
-                if (result.promptFeedback?.blockReason) throw new Error("Safety block: " + result.promptFeedback.blockReason);
-                
-                const imgData = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-                if (!imgData) throw new Error("API tidak merespon dengan data gambar.");
-                
-                return { url: `data:${imgData.inlineData.mimeType};base64,${imgData.inlineData.data}`, part: partNumber, text: overlayText };
-            } catch (err) { 
-                // Mengirim error detail ke layar UI
-                return { error: true, part: partNumber, text: overlayText, detail: err.message }; 
-            }
-        }
-
-        async function regenerateSingleImage(partNumber) {
-            const API_KEY = getApiKey(); if (!API_KEY) return;
-            const input = document.getElementById('novelInput').value.trim(); if (!input) return;
-            showLoading(`Meracik ulang visual Part ${partNumber}...`);
-            try {
-                const promptStr = `Konteks Cerita:\n${input.substring(0, 5000)}\n\nBuatkan 1 adegan visual baru (imagePrompt) dan 1 teks poster clickbait baru (imageText) SESUAI CERITA DI ATAS untuk Part ${partNumber}.
-imagePrompt: PHOTOREALISTIC CINEMATIC movie scene.
-imageText: Teks clickbait. WAJIB diawali "PART ${partNumber}: ".`;
-                
-                const schema = { type: "OBJECT", properties: { imagePrompt: { type: "STRING" }, imageText: { type: "STRING" } }, required: ["imagePrompt", "imageText"] };
-                const payload = { 
-                    contents: [{ parts: [{ text: promptStr }] }], 
-                    generationConfig: { responseMimeType: "application/json", responseSchema: schema },
-                    safetySettings: relaxedSafety 
-                };
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
-                
-                const res = await fetchWithRetry(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-                const data = JSON.parse(res.candidates[0].content.parts[0].text);
-                
-                const newPrompt = data.imagePrompt || "Cinematic dramatic scene";
-                const newText = data.imageText || `PART ${partNumber}`;
-                globalImagePrompts[`part${partNumber}`] = newPrompt; globalImageTexts[`part${partNumber}`] = newText;
-
-                document.getElementById(`img-preview-${partNumber}`).classList.add('hidden');
-                document.getElementById(`img-download-${partNumber}`).classList.add('hidden');
-                document.getElementById(`img-loader-${partNumber}`).classList.remove('hidden');
-                document.getElementById(`img-status-${partNumber}`).innerText = "Melukis ulang...";
-                document.getElementById(`img-status-${partNumber}`).classList.remove('hidden');
-                hideLoading();
-
-                const imgObj = await generateSafeImage(newPrompt, newText, partNumber, API_KEY);
-                renderSingleImage(imgObj, partNumber);
-            } catch (e) { hideLoading(); alert("Gagal regenerate gambar: " + e.message); document.getElementById(`img-loader-${partNumber}`).classList.add('hidden'); }
-        }
-
-        function generateUIStructure() {
-            const container = document.getElementById('partsContainer'); container.innerHTML = '';
-            for (let i = 1; i <= 3; i++) {
-                container.innerHTML += `
-                    <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
-                        <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700"><h2 class="font-black text-xl tracking-wide">BAGIAN (PART) ${i}</h2></div>
-                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
-                            <div class="p-5 flex flex-col h-full bg-blue-50/20">
-                                <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-blue-800 text-sm">FB (Utuh)</h3><span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold" id="fb-char-${i}">0c</span></div>
-                                <textarea id="fb-text-${i}" class="w-full h-80 p-3 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 flex-grow mb-4 resize-none bg-white text-gray-700"></textarea>
-                                <button onclick="copyText('fb-text-${i}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3 rounded-xl transition">Copy FB Part ${i}</button>
-                            </div>
-                            <div class="p-5 flex flex-col h-full bg-pink-50/20">
-                                <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-pink-700 text-sm">IG (Sama)</h3><span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-bold" id="ig-char-${i}">0c</span></div>
-                                <textarea id="ig-text-${i}" class="w-full h-80 p-3 border border-pink-200 rounded-xl text-sm focus:ring-2 focus:ring-pink-500 flex-grow mb-4 resize-none bg-white text-gray-700"></textarea>
-                                <button onclick="copyText('ig-text-${i}')" class="w-full bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold py-3 rounded-xl transition">Copy IG Part ${i}</button>
-                            </div>
-                            <div class="p-5 flex flex-col h-full bg-gray-50/50">
-                                <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-gray-900 text-sm">TikTok (Sama)</h3><span class="text-[10px] bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full font-bold" id="tt-char-${i}">0c</span></div>
-                                <textarea id="tt-text-${i}" class="w-full h-80 p-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-gray-500 flex-grow mb-4 resize-none bg-white text-gray-700"></textarea>
-                                <button onclick="copyText('tt-text-${i}')" class="w-full bg-black hover:bg-gray-900 text-white text-sm font-bold py-3 rounded-xl transition">Copy TikTok Part ${i}</button>
-                            </div>
-                            <div class="p-5 flex flex-col h-full bg-emerald-50/30">
-                                <h3 class="font-bold text-emerald-800 text-sm mb-3">Visual Poster</h3>
-                                <div id="img-container-${i}" class="relative w-full aspect-[9/16] bg-gray-200 rounded-2xl border-2 border-emerald-100 mb-4 overflow-hidden flex flex-col items-center justify-center">
-                                    <div class="loader-sm" id="img-loader-${i}"></div>
-                                    <span id="img-status-${i}" class="text-xs text-gray-500 mt-3 font-medium text-center px-4">Melukis visual...</span>
-                                    <img id="img-preview-${i}" class="w-full h-full object-cover hidden transition-opacity">
-                                </div>
-                                <div class="flex flex-col gap-2 mt-auto">
-                                    <a id="img-download-${i}" class="hidden w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-3 rounded-xl cursor-pointer">📥 Simpan Gambar</a>
-                                    <button onclick="regenerateSingleImage(${i})" class="w-full bg-white border-2 border-emerald-500 text-emerald-700 hover:bg-emerald-50 text-sm font-bold py-2.5 rounded-xl">Generate Ulang</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function populateTextData(fb, ig, tt) {
-            for (let i = 1; i <= 3; i++) {
-                if(document.getElementById(`fb-text-${i}`)) { document.getElementById(`fb-text-${i}`).value = fb[`part${i}`]; document.getElementById(`fb-char-${i}`).innerText = fb[`part${i}`].length; }
-                if(document.getElementById(`ig-text-${i}`)) { document.getElementById(`ig-text-${i}`).value = ig[`part${i}`]; document.getElementById(`ig-char-${i}`).innerText = ig[`part${i}`].length; }
-                if(document.getElementById(`tt-text-${i}`)) { document.getElementById(`tt-text-${i}`).value = tt[`part${i}`]; document.getElementById(`tt-char-${i}`).innerText = tt[`part${i}`].length; }
-            }
-        }
-
-        function renderSingleImage(imgObj, partNumber) {
-            document.getElementById(`img-loader-${partNumber}`).classList.add('hidden');
-            const status = document.getElementById(`img-status-${partNumber}`), preview = document.getElementById(`img-preview-${partNumber}`), btn = document.getElementById(`img-download-${partNumber}`);
-            if (imgObj.error) {
-                // UI ERROR DIPERBARUI: Sekarang menampilkan pesan asli dari Google API
-                status.innerHTML = `<span class="text-red-600 font-bold text-[11px] leading-tight break-words">Error Google API:<br>${imgObj.detail}</span>`;
-                status.classList.remove('hidden');
-            } else {
-                status.classList.add('hidden');
-                preview.src = imgObj.url; preview.classList.remove('hidden');
-                btn.href = imgObj.url; btn.download = `Visual_Part_${partNumber}.png`; btn.classList.remove('hidden'); btn.classList.add('block');
-            }
-        }
-    </script>
-</body>
-</html>
+                    <textarea id="novelInput" class="w-full flex-grow min-
